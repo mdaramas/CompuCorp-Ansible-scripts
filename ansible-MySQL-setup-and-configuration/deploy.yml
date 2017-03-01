@@ -1,0 +1,6 @@
+- hosts: drupal
+  remote_user: ec2-user
+  become: yes
+  become_method: sudo
+  tasks:
+    - include: 'tasks/mysql-setup.yml'

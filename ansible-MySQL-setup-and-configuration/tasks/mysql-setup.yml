@@ -1,0 +1,17 @@
+- name: Add the password mdaramas to mySQL user root
+  shell: /usr/bin/mysqladmin -u root password 'mdaramas'
+
+- name: Remove/drop Anonymous Users from MySQL
+  shell: /usr/bin/mysql -u root --password=mdaramas -e "DELETE FROM mysql.user WHERE User=''";
+
+- name: Remove/drop remote root access to MySQL
+  shell: /usr/bin/mysql -u root --password=mdaramas -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')";
+
+- name: Remove/drop test database from MySQL 
+  shell: /usr/bin/mysql -u root --password=mdaramas -e "DROP DATABASE test";
+
+- name: Remove privileges on test database
+  shell: /usr/bin/mysql -u root --password=mdaramas -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'";
+
+- name: Create Drupal, CiviCRM DBs and users creation
+  shell: chmod a+x /home/ec2-user/Source/CompuCorp-Files-and-Settings/MySQL-Setup/MySQL-Setup.sh && /home/ec2-user/Source/CompuCorp-Files-and-Settings/MySQL-Setup/MySQL-Setup.sh 

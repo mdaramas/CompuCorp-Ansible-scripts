@@ -1,0 +1,15 @@
+- name: Get composer
+  become_user: mdaramas
+  shell: /usr/bin/php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+
+- name: Setup Composer
+  become_user: mdaramas
+  shell: /usr/bin/php composer-setup.php --filename=composer && /usr/bin/php -r "unlink('composer-setup.php');"
+
+- name: Install Drush 8
+  become_user: mdaramas
+  shell: chmod a+x /home/mdaramas/composer && /home/mdaramas/composer global require drush/drush:8.*
+
+- name: Add drush binary path in PATH variable for user mdaramas
+  become_user: mdaramas
+  shell: echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> .bash_profile

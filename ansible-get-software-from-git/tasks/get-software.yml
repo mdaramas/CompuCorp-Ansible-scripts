@@ -1,0 +1,6 @@
+- name: Make a directory called Source under the home directory of ec2-user which will contain all the files for the whole setup
+  shell: mkdir /home/ec2-user/Source && chown ec2-user.ec2-user /home/ec2-user/Source
+
+
+- name: Download all the relevant files from mdaramas Git Repository
+  shell: cd /home/ec2-user/Source && /usr/bin/git clone https://github.com/mdaramas/CompuCorp-Files-and-Settings.git

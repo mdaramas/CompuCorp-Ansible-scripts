@@ -1,0 +1,3 @@
+- name: Install cronjob with certbot for automatic certificate renewal
+  shell: /bin/cp ~ec2-user/Source/CompuCorp-Files-and-Settings/Certbot-cronjob/root /var/spool/cron
+

@@ -1,0 +1,2 @@
+This repository contains all the Ansible scripts that are used in order to install a new server with Drupal and CiviCRM applications.
+It also contains a bash script called install-script.sh, which shows the sequence of ansible scripts used for the installation.

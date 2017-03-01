@@ -1,0 +1,8 @@
+- name: Enable Nginx on startup
+  shell: /sbin/chkconfig nginx on
+
+- name: Enable PHP-FPM  on startup
+  shell: /sbin/chkconfig php-fpm on
+
+- name: Enable MySQL on startup
+  shell: /sbin/chkconfig mysqld on

@@ -1,0 +1,14 @@
+- name: Installing the 'Development tools' package group
+  yum:
+    name: "@Development Tools"
+    state: present
+
+- name: Installing extra devel packages
+  yum:
+    name: zlib-devel, perl-ExtUtils-MakeMaker, asciidoc, xmlto, openssl-devel, augeas-libs, libffi-devel, python27-tools, git, pam-devel, libcurl-devel, expat-devel
+    state: latest
+
+- name: Installing PHP, NGINX and MySQL
+  yum:
+    name: nginx, php55-fpm, php55-cli, php55-mbstring, php55-process, php55-xml, php55-pdo, php-pear, php55-common, php55-mysqlnd, php55-gd, mysql-server
+    state: latest

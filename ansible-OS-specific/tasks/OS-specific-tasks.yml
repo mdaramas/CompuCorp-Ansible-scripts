@@ -1,0 +1,59 @@
+- name: Create a swapfile of 3G
+  shell: dd if=/dev/zero of=/swapfile bs=3M count=1024 ; mkswap /swapfile ; chmod 0600 /swapfile
+
+- name: Make the swapfile available
+  shell: swapon /swapfile
+
+- name: Create user (mdaramas)
+  shell: useradd mdaramas
+
+- name: Give him as password the same as his username
+  shell: echo -e "mdaramas\nmdaramas" | (passwd --stdin mdaramas)
+
+- name: Add /usr/local/bin and ~mdaramas/git/libexec/git-core/ to the current PATH of root user
+  shell: echo PATH=/usr/local/bin:/home/mdaramas/git/libexec/git-core:$PATH  >> /root/.bash_profile
+
+- name: Install Git under mdaramas user
+  shell: cd ~mdaramas && wget -O git.zip https://github.com/git/git/archive/master.zip && unzip git.zip && cd git-master && make prefix=/home/mdaramas/git install && /bin/rm -rf ~mdaramas/git.zip ~mdaramas/git-master && echo PATH=/usr/local/bin:/home/mdaramas/git/libexec/git-core:$PATH  >> /home/mdaramas/.bash_profile && chown -R mdaramas.mdaramas ~mdaramas/git
+
+- name: Upgrade pip to latest version
+  shell: /usr/bin/pip install --upgrade pip
+
+- name: Install virtualenv via pip
+  shell: /usr/local/bin/pip install virtualenv --upgrade
+
+- name: Create dhparam folder to host the dhparam-key.pem file and copy the cert file
+  shell: mkdir /etc/nginx/dhparam-key && /bin/cp ~ec2-user/Source/CompuCorp-Files-and-Settings/Nginx-PHP_Conf/DHparam-certificate/dhparams.pem /etc/nginx/dhparam-key
+
+- name: Create Drupal folder under /usr/share/nginx/html
+  shell: mkdir /usr/share/nginx/html/drupal && /bin/rm -f /usr/share/nginx/html/*html /usr/share/nginx/html/*png
+
+- name: Extract and copy the Letsencrypt application along with the account info and the certificates
+  shell: /bin/cp ~ec2-user/Source/CompuCorp-Files-and-Settings/LetsEncrypt/letsencrypt-incl-keys.tar.gz / && cd / && tar zxf letsencrypt-incl-keys.tar.gz && rm -f letsencrypt-incl-keys.tar.gz
+
+- name: Install certbot-auto application for certification renewal
+  shell: cd ~ec2-user/Source && wget https://dl.eff.org/certbot-auto && chmod a+x certbot-auto
+
+- name: Copy the included fstab file which contains the /swapfile
+  shell: /bin/cp ~ec2-user/Source/CompuCorp-Files-and-Settings/OS-Specific_Files/fstab /etc
+
+- name: Copy the contents of the Drupal gzipped file under /usr/share/nginx/html/drupal folder
+  shell: cd ~ec2-user/Source/CompuCorp-Files-and-Settings/Software && tar zxf drupal-7.54.tar.gz && cd drupal-7.54 && /bin/cp -r * /usr/share/nginx/html/drupal && /bin/cp -f .editorconfig .gitignore .htaccess /usr/share/nginx/html/drupal
+
+- name: Copy the Nginx and the php-fpm conf files
+  shell: /bin/cp -f ~ec2-user/Source/CompuCorp-Files-and-Settings/Nginx-PHP_Conf/nginx.conf /etc/nginx && /bin/cp -f ~ec2-user/Source/CompuCorp-Files-and-Settings/Nginx-PHP_Conf/php-fpm.d/www.conf /etc/php-fpm.d && /bin/cp -f ~ec2-user/Source/CompuCorp-Files-and-Settings/Nginx-PHP_Conf/php.ini /etc/
+
+- name: Extract and copy the Civicrm module under the Drupal installation
+  shell: cd ~ec2-user/Source/CompuCorp-Files-and-Settings/Software && tar zxf civicrm-4.7.16-drupal.tar.gz && /bin/cp -r ~ec2-user/Source/CompuCorp-Files-and-Settings/Software/civicrm /usr/share/nginx/html/drupal/sites/all/modules
+
+- name: Extract and copy the Backup and Migrate for AWS S3 module under the modules folder
+  shell: cd ~ec2-user/Source/CompuCorp-Files-and-Settings/Drupal-Modules && tar zxf backup_migrate-7.x-3.1.tar.gz && tar zxf backup_migrate_s3-7.x-1.1.tar.gz && /bin/cp -r ~ec2-user/Source/CompuCorp-Files-and-Settings/Drupal-Modules/backup_migrate* /usr/share/nginx/html/drupal/sites/all/modules
+
+- name: Extract and copy the Backup and Migrate Library under the sites/all/libraries folder
+  shell: cd ~ec2-user/Source/CompuCorp-Files-and-Settings/Amazon-S3-PHP-Class-Library && tar zxf tpyo-amazon-s3-php-class-v0.5.1-4-g9cf2eec.tar.gz && mkdir /usr/share/nginx/html/drupal/sites/all/libraries/s3-php5-curl && /bin/cp tpyo-amazon-s3-php-class-9cf2eec/* /usr/share/nginx/html/drupal/sites/all/libraries/s3-php5-curl
+
+- name: Copy the default.settings.php file to settings.php and change its permission
+  shell: /bin/cp /usr/share/nginx/html/drupal/sites/default/default.settings.php /usr/share/nginx/html/drupal/sites/default/settings.php && chmod a+w /usr/share/nginx/html/drupal/sites/default && chmod a+w /usr/share/nginx/html/drupal/sites/default/settings.php
+
+- name: Change ownership to user nginx under the whole drupal directory
+  shell: chown -R nginx.nginx /usr/share/nginx/html/drupal

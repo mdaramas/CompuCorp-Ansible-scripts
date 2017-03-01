@@ -1,0 +1,9 @@
+- name: Make a backup of /etc/ssh folder to /etc/ssh-backup
+  shell: /bin/cp -r /etc/ssh /etc/ssh-backup 
+
+- name: Configure and install OpenSSH 7.4p1
+  shell: cd ~ec2-user/Source/CompuCorp-Files-and-Settings/OpenSSH && tar zxf openssh-7.4p1.tar.gz && cd openssh-7.4p1 && ./configure --prefix=/usr --sysconfdir=/etc/ssh --with-pam && make && make install
+
+- name: Copy all the files from /etc/ssh-backup to /etc/ssh and restart sshd service
+  shell: /bin/cp -f /etc/ssh-backup/* /etc/ssh && chmod 0600 /etc/ssh/ssh_host_ed25519_key && service sshd restart && /bin/rm -rf /etc/ssh-backup
+
